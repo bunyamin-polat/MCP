@@ -1,0 +1,26 @@
+services:
+  weather:
+    build: .
+    command: uv run python servers/weather_server.py
+    ports:
+      - "8000:8000"
+
+  search:
+    build: .
+    command: uv run python servers/search_server.py
+    ports:
+      - "8001:8001"
+    env_file: .env
+
+  app:
+    build: .
+    command: uv run python cli.py
+    depends_on:
+      - weather
+      - search
+    environment:
+      - WEATHER_SERVER_URL=http://weather:8000/mcp
+      - SEARCH_SERVER_URL=http://search:8001/mcp
+    env_file: .env
+    stdin_open: true
+    tty: true
